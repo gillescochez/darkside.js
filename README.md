@@ -79,6 +79,10 @@ document.cookie setter
 
 document.cookie getter
 
+### init
+
+Call init refresh and set interval to watch for document.cookie changes
+
 ## Defaults
 
 Defaults value to be use for options not provided on write calls. All disabled by default.
@@ -101,5 +105,5 @@ Cache structure and types
 
 Started from the MDN approach and ended up with some of cookies and it's great JSON usage.
 
-https://code.google.com/p/cookies/
-https://developer.mozilla.org/en-US/docs/DOM/document.cookie
+* https://code.google.com/p/cookies/
+* https://developer.mozilla.org/en-US/docs/DOM/document.cookie

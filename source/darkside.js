@@ -111,7 +111,7 @@
 		},
 	
 		cache: {
-			cookie: document.cookie,
+			cookie: "",
 			keys: [],
 			values: [],
 			pairs: {}
