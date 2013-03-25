@@ -1,4 +1,6 @@
 (function(DarkSide) {
+
+	'use strict';
  
 	extend(DarkSide.prototype, {
 	
