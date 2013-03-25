@@ -10,3 +10,11 @@ darkside.write('object', {
 
 var pairs = darkside.pairs();
 console.log(pairs, darkside);
+
+
+// test cacheLife
+document.cookie = 'test=baba;';
+
+setTimeout(function() {
+	console.log(darkside.pairs(), darkside);
+}, 250);

@@ -8,13 +8,17 @@
 			domain: null,
 			secure: null,
 		},
-		
-		init: function(me) {
-			this.interval = setInterval(function() {
-				if (me.cache.cookie !== document.cookie) me.refresh();
-			}, 250);
-		},
 	
+		cache: {
+			cookie: "",
+			keys: [],
+			values: [],
+			pairs: {},
+			time: 0
+		},
+		
+		cacheLife: 250,
+		
 		write: function (key, value, options) {
 	
 			var expires = "",
@@ -23,7 +27,7 @@
 			if (options) extend(config, options);
 
 			if (!key || /^(?:expires|max\-age|path|domain|secure)$/i.test(key)) return;
-
+			
 			if (config.end) {
 				switch (end.constructor) {
 					case Number:
@@ -56,11 +60,13 @@
 		read: function(key) {
 		
 			if (!key || !this.exists(key)) return null;
+			
+			this.refreshIfOld();
 			return this.cache.pairs[key];
 		},
 		
 		remove: function(key, path) {
-		
+
 			if (!key || !this.exists(key)) return;
 			
 			this.set(
@@ -88,41 +94,34 @@
 		},
 		
 		exists: function(key) {
-		
-			return inArray(this.cache.keys, key);
+			return this.cache.pairs[key] ? true : false;
 		},
 		
 		keys: function() {
 		
-			if (!this.cache.keys.length) this.refresh();
+			this.refreshIfOld();
 			return this.cache.keys;
 		},
 		
 		values: function() {
 		
-			if (!this.cache.values.length) this.refresh();
+			this.refreshIfOld();
 			return this.cache.values;
 		},
 		
 		pairs: function() {
 		
-			if (!this.cache.pairs.length) this.refresh();
+			this.refreshIfOld();
 			return this.cache.pairs;
-		},
-	
-		cache: {
-			cookie: "",
-			keys: [],
-			values: [],
-			pairs: {}
 		},
 		
 		refresh: function() {
 
-			var pairs = {}, keys = [], values = [],
+			var freshCookie = document.cookie,
+				pairs = {}, keys = [], values = [],
 				pair, key, value, rawValue,
 				
-				arr = this.get().split(';'), 
+				arr = freshCookie.split(';'), 
 				len = arr.length,
 				i = 0;
 			
@@ -143,17 +142,25 @@
 						value = JSON.parse( value );
 					} catch(e2) {
 						value = rawValue;
-					}
-				}
+					};
+				};
 
 				keys.push(key);
 				values.push(value);
 				pairs[key] = value;
 			};
 			
+			this.cache.cookie = freshCookie;
 			this.cache.keys = keys;
 			this.cache.values = values;
 			this.cache.pairs = pairs;
+			this.cache.time = new Date().getTime();
+		},
+		
+		refreshIfOld: function() {
+			if ((this.cache.cookie !== document.cookie) || (new Date().getTime() - this.cache.time > this.cacheLife)) {
+				this.refresh();
+			};
 		},
 		
 		set: function(str) {
@@ -162,11 +169,6 @@
 		
 		get: function() {
 			return document.cookie;
-		},
-		
-		// :p
-		toString: function() {
-			return "Come to the dark side we've got cookies...";
 		}
 	});
 	
@@ -177,21 +179,8 @@
 		for (var prop in sup) sub[prop] = sup[prop];
 	};
 	
-	function inArray(array, key) {
-	
-		var len = array.length, 
-			i = 0;
-			
-		for (; i < len; i++) {
-			if (array[i] ===  key) return true;
-		};
-		
-		return false;
-	};
-	
 	window.darkside = new DarkSide();
 
 })(function DarkSide(){
 	this.refresh();
-	this.init(this);
 });

@@ -3,7 +3,7 @@ darkside.js
 
 darkside is a singleton class to facilitate the manipulation of Cookies, ence the `clever`.. erm.. name...
 
-All cookie data is stored internally and updated everytime keys are added/removed. There is also a interval watching for document.cookie changes so the stored data is updated  if other scripts modify document.cookie
+All cookie data is stored internally and updated everytime keys are added/removed or when a request is made and the current cache life as ended (see cacheLife)
 
 When the JSON object is available it's possible to store values of any types as JSON.stringify and JSON.parse will be used.
 See https://github.com/component/json-fallback for older browsers if you have to support them.
@@ -55,21 +55,19 @@ return an array of all the values found in document.cookie
 
 return object with key/value pairs in document.cookie
 
+### cacheLife
+
+time in milliseconds after which the cache will be considered invalid and ence initiate a refresh on next request
+
 ## Advanced API
-
-### interval
-
-If you don't need darkside to monitor document.cookie you can use this token to clear the interval
-
-```javascript 
-
-clearInterval(darkside.interval); 
-
-```
 
 ### refresh()
 
-regenerate the cache
+regenerate the cache using the current value of document.cookie
+
+### refreshIfOld()
+
+regenerate the cache only if the cache is obsolete, as in passed is life or document.cookie differ from cached one.
 
 ### set
 
@@ -78,10 +76,6 @@ document.cookie setter
 ### get
 
 document.cookie getter
-
-### init
-
-Call init refresh and set interval to watch for document.cookie changes
 
 ## Defaults
 
@@ -100,6 +94,25 @@ Cache structure and types
 * darkside.cache.keys (Array)
 * darkside.cache.values (Array)
 * darkside.cache.pairs (Object)
+
+## Usage
+
+```javascript
+
+darkside.removeAll('/demos/darkside');
+darkside.write('foo', 'foo');
+
+darkside.write('array', ['a','b']);
+darkside.write('object', {
+	a:'a',
+	b:'b'
+});
+
+
+var pairs = darkside.pairs();
+console.log(pairs, darkside);
+
+```
 
 ## Credits
 
