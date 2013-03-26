@@ -15,11 +15,8 @@
 			cookie: "",
 			keys: [],
 			values: [],
-			pairs: {},
-			time: 0
+			pairs: {}
 		},
-		
-		cacheLife: 250,
 		
 		write: function (key, value, options) {
 	
@@ -63,7 +60,7 @@
 		
 			if (!key || !this.exists(key)) return null;
 			
-			this.refreshIfOld();
+			this.refreshIf();
 			return this.cache.pairs[key];
 		},
 		
@@ -101,19 +98,19 @@
 		
 		keys: function() {
 		
-			this.refreshIfOld();
+			this.refreshIf();
 			return this.cache.keys;
 		},
 		
 		values: function() {
 		
-			this.refreshIfOld();
+			this.refreshIf();
 			return this.cache.values;
 		},
 		
 		pairs: function() {
 		
-			this.refreshIfOld();
+			this.refreshIf();
 			return this.cache.pairs;
 		},
 		
@@ -156,13 +153,10 @@
 			this.cache.keys = keys;
 			this.cache.values = values;
 			this.cache.pairs = pairs;
-			this.cache.time = new Date().getTime();
 		},
 		
-		refreshIfOld: function() {
-			if ((this.cache.cookie !== document.cookie) || (new Date().getTime() - this.cache.time > this.cacheLife)) {
-				this.refresh();
-			};
+		refreshIf: function() {
+			if (this.cache.cookie !== document.cookie) this.refresh();
 		},
 		
 		set: function(str) {

@@ -65,9 +65,9 @@ time in milliseconds after which the cache will be considered invalid and ence i
 
 regenerate the cache using the current value of document.cookie
 
-### refreshIfOld()
+### refreshIf()
 
-regenerate the cache only if the cache is obsolete, as in passed is life or document.cookie differ from cached one.
+regenerate the cache only if the cache is obsolete.
 
 ### set
 
