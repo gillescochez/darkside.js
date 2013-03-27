@@ -1,9 +1,9 @@
 darkside.js
 ===========
 
-darkside is a singleton class to facilitate the manipulation of Cookies, ence the `clever`.. erm.. name...
+darkside is a singleton class that facilitate the manipulation of Cookies, ence the `clever`.. erm.. name...
 
-All cookie data is stored internally and updated everytime keys are added/removed or when a request is made and the current cache life as ended (see cacheLife)
+All cookie data is stored internally and updated everytime keys are added/removed or when a request is made and the cached cookie string is different than the current one.
 
 When the JSON object is available it's possible to store values of any types as JSON.stringify and JSON.parse will be used.
 See https://github.com/component/json-fallback for older browsers if you have to support them.
