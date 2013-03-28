@@ -83,8 +83,6 @@
 				i = 0;
 				
 			for (; i < len; i++) this.remove.apply(this, [keys[i], path]);
-			
-			this.refresh();
 		},
 		
 		equal: function(key, value) {
