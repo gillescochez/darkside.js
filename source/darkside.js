@@ -64,7 +64,7 @@
 			return this.cache.pairs[key];
 		},
 		
-		remove: function(key, path) {
+		remove: function(key, path, skip) {
 
 			if (!key || !this.exists(key)) return;
 			
@@ -73,7 +73,7 @@
 				+ (path ? "; path=" + path : "")
 			);
 			
-			this.refresh();
+			if (!skip) this.refresh();
 		},
 		
 		removeAll: function(path) {
@@ -82,7 +82,9 @@
 				len = keys.length,
 				i = 0;
 				
-			for (; i < len; i++) this.remove.apply(this, [keys[i], path]);
+			for (; i < len; i++) this.remove.apply(this, [keys[i], path], true);
+			
+			this.refresh();
 		},
 		
 		equal: function(key, value) {
@@ -114,8 +116,11 @@
 		
 		refresh: function() {
 
-			var freshCookie = document.cookie,
-				pairs = {}, keys = [], values = [],
+			var freshCookie = document.cookie;
+			
+			if (freshCookie) {
+			
+			var pairs = {}, keys = [], values = [],
 				pair, key, value, rawValue,
 				
 				arr = freshCookie.split(';'), 
@@ -151,6 +156,15 @@
 			this.cache.keys = keys;
 			this.cache.values = values;
 			this.cache.pairs = pairs;
+			
+			} else {
+			
+				this.cache.cookie = '';
+				this.cache.keys = [];
+				this.cache.values = [];
+				this.cache.pairs = {};
+				
+			};
 		},
 		
 		refreshIf: function() {
