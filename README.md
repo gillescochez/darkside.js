@@ -35,7 +35,7 @@ return true/false depending if the key exists/not exists
 
 return true/false if the value is found/not found in document.cookie
 
-### pairExists)key, value);
+### pairExists(key, value);
 
 return true/false if the value associated with the key in cookie is equal/not equal to the value given
 
