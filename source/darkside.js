@@ -1,28 +1,28 @@
 (function(DarkSide) {
 
 	'use strict';
- 
+
 	extend(DarkSide.prototype, {
-	
+
 		defaults: {
 			end: null,
 			path: null,
 			domain: null,
 			secure: null,
 		},
-	
+
 		cache: {
 			cookie: "",
 			keys: [],
 			values: [],
 			pairs: {}
 		},
-		
+
 		write: function (key, value, options) {
-	
+
 			var expires = "",
 				config = this.defaults;
-				
+
 			if (options) extend(config, options);
 
 			if (!key || /^(?:expires|max\-age|path|domain|secure)$/i.test(key)) return;
@@ -41,12 +41,9 @@
 				};
 			};
 			
-			if (typeof value !== 'string') {
-				if (window.JSON && JSON.stringify) value = JSON.stringify( value );
-				else throw new Error('darkside.write could not serialize value.');
-			};
+			if (typeof value !== 'string') value = stringify(value);
 			
-			this.set(
+			set(
 				escape(key) + "="  + escape(value) + expires 
 				+ (config.domain ? "; domain=" + config.domain : "") 
 				+ (config.path ? "; path=" + config.path : "") 
@@ -68,7 +65,7 @@
 
 			if (!key || !this.exists(key)) return;
 			
-			this.set(
+			set(
 				escape(key) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" 
 				+ (path ? "; path=" + path : "")
 			);
@@ -93,7 +90,17 @@
 		},
 		
 		exists: function(key) {
-			return this.cache.pairs[key] ? true : false;
+			return this.cache.pairs[key];
+		},
+		
+		valueExists: function(value) {
+			if (typeof value !== 'string') value = stringify(value);
+			return this.cache.values[value];
+		},
+		
+		pairExists: function(key, value) {
+			if (typeof value !== 'string') value = stringify(value);
+			return this.cache.pairs[key] && (this.cache.pairs[key] === value);
 		},
 		
 		keys: function() {
@@ -116,46 +123,46 @@
 		
 		refresh: function() {
 
-			var freshCookie = document.cookie;
+			var freshCookie = get();
 			
 			if (freshCookie) {
 			
-			var pairs = {}, keys = [], values = [],
-				pair, key, value, rawValue,
+				var pairs = {}, keys = [], values = [],
+					pair, key, value, rawValue,
+					
+					arr = freshCookie.split(';'), 
+					len = arr.length,
+					i = 0;
 				
-				arr = freshCookie.split(';'), 
-				len = arr.length,
-				i = 0;
-			
-			for (; i < len; i++) {
-			
-				pair = arr[i].split( '=' );
-				key = pair[0].replace( /^\s*/, '' ).replace( /\s*$/, '' );
+				for (; i < len; i++) {
+				
+					pair = arr[i].split( '=' );
+					key = pair[0].replace( /^\s*/, '' ).replace( /\s*$/, '' );
 
-				try {
-					value = decodeURIComponent( pair[1] );
-				} catch(e1) {
-					value = pair[1];
-				};
-				
-				if (window.JSON && JSON.parse) {
 					try {
-						rawValue = value;
-						value = JSON.parse( value );
-					} catch(e2) {
-						value = rawValue;
+						value = decodeURIComponent( pair[1] );
+					} catch(e1) {
+						value = pair[1];
 					};
-				};
+					
+					if (window.JSON && JSON.parse) {
+						try {
+							rawValue = value;
+							value = JSON.parse( value );
+						} catch(e2) {
+							value = rawValue;
+						};
+					};
 
-				keys.push(key);
-				values.push(value);
-				pairs[key] = value;
-			};
-			
-			this.cache.cookie = freshCookie;
-			this.cache.keys = keys;
-			this.cache.values = values;
-			this.cache.pairs = pairs;
+					keys.push(key);
+					values.push(value);
+					pairs[key] = value;
+				};
+				
+				this.cache.cookie = freshCookie;
+				this.cache.keys = keys;
+				this.cache.values = values;
+				this.cache.pairs = pairs;
 			
 			} else {
 			
@@ -169,22 +176,28 @@
 		
 		refreshIf: function() {
 			if (this.cache.cookie !== document.cookie) this.refresh();
-		},
-		
-		set: function(str) {
-			document.cookie = str;
-		},
-		
-		get: function() {
-			return document.cookie;
 		}
 	});
 	
 	/*
 		Private helpers
 	*/
+	function stringify(value) {
+		if (window.JSON && JSON.stringify) value = JSON.stringify( value );
+		else throw new Error('darkside: could not serialize value');
+		return value;
+	};
+	
 	function extend(sub, sup) {
 		for (var prop in sup) sub[prop] = sup[prop];
+	};
+	
+	function set(str) {
+		document.cookie = str;
+	};
+	
+	function get() {
+		return document.cookie;
 	};
 	
 	window.darkside = new DarkSide();
